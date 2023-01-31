@@ -1,6 +1,12 @@
 local wezterm = require 'wezterm'
 local utils = require 'utils'
 
+local CONFIG = {
+   padding = 1,
+   use_icons = true,
+   colorize_icons = false,
+}
+
 --- @type table<number, string>
 local tab_icons = {}
 
@@ -53,10 +59,14 @@ local icon_variants = utils.map({
    end
 
    if type(i) == 'table' then
-      return wezterm.format {
-         { Foreground = i[2] },
-         { Text = wezterm.nerdfonts[i[1]] },
-      }
+      if CONFIG.use_icon_colors then
+         return wezterm.format {
+            { Foreground = i[2] },
+            { Text = wezterm.nerdfonts[i[1]] },
+         }
+      else
+         return wezterm.nerdfonts[i[1]]
+      end
    end
 
    error('unexpected type')
@@ -67,15 +77,19 @@ wezterm.on(
    function(tab)
       -- start indexing tabs from 1
       local index = tab.tab_index + 1
-      local padding = '  '
       local id = tab.tab_id
+      local pad = string.rep(' ', CONFIG.padding)
 
-      if tab_icons[id] == nil then
-         tab_icons[id] = icon_variants[math.random(#icon_variants)]
+      if CONFIG.use_icons then
+         if tab_icons[id] == nil then
+            tab_icons[id] = icon_variants[math.random(#icon_variants)]
+         end
+
+         local icon = tab_icons[id]
+         return string.format('%s%s %d%s', pad, icon, index, pad)
       end
 
-      local icon = tab_icons[id]
-      return padding .. icon .. ' ' .. index .. padding
+      return string.format('%s %d %s', pad, index, pad)
    end
 )
 

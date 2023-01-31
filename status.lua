@@ -10,31 +10,33 @@ local wezterm = require 'wezterm'
 local function render_battery(battery)
    --- @type table<string, string>
    local icons = wezterm.nerdfonts
-
-   local prefix = 'mdi_battery'
-   if battery.state == 'Charging' then
-      prefix = prefix .. '_charging'
-   end
-
    local percent = battery.state_of_charge
+   local formatted_percent = string.format('%.0f%%', percent * 100)
 
-   --- @type string
-   local icon_name
+   local get_icon = function()
+      local prefix = 'mdi_battery'
+      if battery.state == 'Charging' then
+         return icons[prefix .. '_charging']
+      end
 
-   if percent == 1 then
-      icon_name = prefix
-   else
-      local suffix = math.max(1, math.ceil(percent * 10))
-      icon_name = prefix .. '_' .. suffix .. '0'
+      --- @type string
+      local icon_name
+
+      if percent == 1 then
+         icon_name = prefix
+      else
+         local suffix = math.max(1, math.ceil(percent * 10)) .. '0'
+         icon_name = prefix .. '_' .. suffix
+      end
+
+      local color = percent <= 0.1 and 'Red' or 'Green'
+      return wezterm.format {
+         { Foreground = { AnsiColor = color } },
+         { Text = icons[icon_name] }
+      }
    end
 
-   local color = percent <= 0.1 and 'Red' or 'Green'
-   local icon = wezterm.format {
-      { Foreground = { AnsiColor = color } },
-      { Text = icons[icon_name] }
-   }
-
-   return icon .. ' ' .. string.format('%.0f%%', percent * 100)
+   return string.format('%s %s', get_icon(), formatted_percent)
 end
 
 local function update_right_status(window)
@@ -55,7 +57,7 @@ local function update_right_status(window)
       battery = render_battery(b)
    end
 
-   local status = battery .. ' ' .. tilde .. ' ' .. date .. ' '
+   local status = string.format('%s %s %s ', battery, tilde, date)
    window:set_right_status(wezterm.format {
       { Text = status }
    })
