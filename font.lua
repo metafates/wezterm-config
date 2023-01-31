@@ -13,7 +13,7 @@ local font_family = ({
    'Monocraft', -- [8]
    'Comic Mono', -- [9]
    'Input Mono', -- [10]
-})[10]
+})[1]
 
 local options = {}
 if bold then

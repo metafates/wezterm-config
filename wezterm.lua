@@ -1,7 +1,6 @@
 local utils = require 'utils'
-local listeners = require 'listeners'
 
-listeners.listen()
+require('status').enable()
 
 local modules = utils.map({
    'window',
@@ -9,5 +8,6 @@ local modules = utils.map({
    'theme',
    'tab'
 }, utils.req)
+
 
 return utils.merge(table.unpack(modules))

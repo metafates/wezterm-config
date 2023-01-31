@@ -17,12 +17,14 @@ local function render_battery(battery)
    end
 
    local percent = battery.state_of_charge
-   local icon = prefix .. '_' .. math.max(1, math.ceil(percent * 10)) .. '0'
 
+   local suffix = math.min(9, math.max(1, math.ceil(percent * 10)))
+
+   local icon = prefix .. '_' .. suffix .. '0'
    return icons[icon] .. ' ' .. string.format('%.0f%%', percent * 100)
 end
 
-function M.update_right_status(window)
+local function update_right_status(window)
    -- "Wed Mar 3 08:14"
    --- @type string
    local date = wezterm.strftime '%a %b %-d %H:%M'
@@ -41,7 +43,13 @@ function M.update_right_status(window)
    end
 
    local status = battery .. ' ' .. tilde .. ' ' .. date .. ' '
-   window:set_right_status(status)
+   window:set_right_status(wezterm.format {
+      { Text = status }
+   })
+end
+
+function M.enable()
+   wezterm.on('update-right-status', update_right_status)
 end
 
 return M
