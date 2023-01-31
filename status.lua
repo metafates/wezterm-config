@@ -18,9 +18,16 @@ local function render_battery(battery)
 
    local percent = battery.state_of_charge
 
-   local suffix = math.min(9, math.max(1, math.ceil(percent * 10)))
+   --- @type string
+   local icon
 
-   local icon = prefix .. '_' .. suffix .. '0'
+   if percent == 1 then
+      icon = prefix
+   else
+      local suffix = math.max(1, math.ceil(percent * 10))
+      icon = prefix .. '_' .. suffix .. '0'
+   end
+
    return icons[icon] .. ' ' .. string.format('%.0f%%', percent * 100)
 end
 
