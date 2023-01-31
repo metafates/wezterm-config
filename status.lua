@@ -19,16 +19,22 @@ local function render_battery(battery)
    local percent = battery.state_of_charge
 
    --- @type string
-   local icon
+   local icon_name
 
    if percent == 1 then
-      icon = prefix
+      icon_name = prefix
    else
       local suffix = math.max(1, math.ceil(percent * 10))
-      icon = prefix .. '_' .. suffix .. '0'
+      icon_name = prefix .. '_' .. suffix .. '0'
    end
 
-   return icons[icon] .. ' ' .. string.format('%.0f%%', percent * 100)
+   local color = percent <= 0.1 and 'Red' or 'Green'
+   local icon = wezterm.format {
+      { Foreground = { AnsiColor = color } },
+      { Text = icons[icon_name] }
+   }
+
+   return icon .. ' ' .. string.format('%.0f%%', percent * 100)
 end
 
 local function update_right_status(window)
