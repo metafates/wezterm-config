@@ -6,7 +6,7 @@ local modules = utils.map({
    'window',
    'font',
    'theme',
-   'tab'
+   'tab',
 }, utils.req)
 
 
